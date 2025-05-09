@@ -1,7 +1,7 @@
 Package: SNPutils
 Title: Convert Genotype Data to Allele Formats and Generate Summary
     Statistics
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person("Hedia", "Tnani", , "hediatnani0@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0380-9740"))
@@ -20,7 +20,10 @@ Imports:
     tidyr,
     utils
 Suggests: 
+    knitr,
     readr,
+    remotes,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
@@ -28,3 +31,4 @@ Depends:
 LazyData: true
 URL: https://github.com/LabeoFD/SNPutils
 BugReports: https://github.com/LabeoFD/SNPutils/issues
+VignetteBuilder: knitr
