@@ -7,10 +7,10 @@
 \format{
 A data frame with 20 rows and 4 columns:
 \describe{
-\item{probeset_id}{SNP identifier}
-\item{Sample1}{Genotype codes (0, 1, 2) for Sample1}
-\item{Sample2}{Genotype codes (0, 1, 2) for Sample2}
-\item{Sample3}{Genotype codes (0, 1, 2) for Sample3}
+\item{probeset_id}{Character. SNP identifier (SNP1 to SNP20)}
+\item{Sample1}{Numeric. Genotype codes (0, 1, 2) for Sample1}
+\item{Sample2}{Numeric. Genotype codes (0, 1, 2) for Sample2}
+\item{Sample3}{Numeric. Genotype codes (0, 1, 2) for Sample3}
 }
 }
 \usage{
@@ -18,9 +18,15 @@ example_genotypes
 }
 \description{
 A dataset containing example genotype data for 20 SNPs, including 10 indels.
+This data shows genotype calls for multiple samples using numeric encoding (0, 1, 2).
+}
+\details{
+Genotype encoding: 0 = homozygous reference, 1 = heterozygous, 2 = homozygous alternative.
+For indels (SNP11-SNP20): 0 = D/D, 1 = D/I, 2 = I/I.
 }
 \examples{
 data(example_genotypes)
 head(example_genotypes)
+table(example_genotypes$Sample1)
 }
 \keyword{datasets}

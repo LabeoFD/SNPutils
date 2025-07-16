@@ -7,11 +7,11 @@
 \format{
 A data frame with 20 rows and 5 columns:
 \describe{
-\item{Probe.Set.ID}{SNP identifier}
-\item{Chromosome}{Chromosome location}
-\item{Physical.Position}{Base pair position}
-\item{Allele.A}{First allele (deletion marker "-" for indels)}
-\item{Allele.B}{Second allele (insertion sequence for indels)}
+\item{Probe.Set.ID}{Character. SNP identifier matching probeset_id}
+\item{Chromosome}{Character. Chromosome location (1-22, X)}
+\item{Physical.Position}{Integer. Base pair position on chromosome}
+\item{Allele.A}{Character. First allele (deletion marker "-" for indels)}
+\item{Allele.B}{Character. Second allele (insertion sequence for indels)}
 }
 }
 \usage{
@@ -19,9 +19,16 @@ example_annotations
 }
 \description{
 A dataset containing annotation information for 20 SNPs, including 10 regular SNPs and 10 indels.
+This data provides genomic positions and allele information.
+}
+\details{
+For standard SNPs (SNP1-SNP10): Allele.A and Allele.B contain single nucleotides.
+For indels (SNP11-SNP20): Allele.A contains "-" and Allele.B contains insertion sequence.
 }
 \examples{
 data(example_annotations)
 head(example_annotations)
+# Check for indels
+sum(example_annotations$Allele.A == "-")
 }
 \keyword{datasets}

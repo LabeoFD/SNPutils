@@ -8,6 +8,15 @@
 \description{
 Tools for converting numerical genotype data (0, 1, 2) to allele pairs, generating TYP and COM file formats, validating allele assignments, and calculating sample and variant summary statistics.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/LabeoFD/SNPutils}
+  \item \url{https://labeofd.github.io/SNPutils/}
+  \item Report bugs at \url{https://github.com/LabeoFD/SNPutils/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Hedia Tnani \email{hediatnani0@gmail.com} (\href{https://orcid.org/0000-0002-0380-9740}{ORCID})
 
