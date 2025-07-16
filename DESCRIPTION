@@ -15,13 +15,15 @@ RoxygenNote: 7.3.2
 Imports: 
     data.table,
     dplyr,
+    lubridate,
+    purrr,
+    readr,
     stringr,
     tibble,
     tidyr,
     utils
 Suggests: 
     knitr,
-    readr,
     remotes,
     rmarkdown,
     testthat (>= 3.0.0)
@@ -29,6 +31,6 @@ Config/testthat/edition: 3
 Depends: 
     R (>= 3.5)
 LazyData: true
-URL: https://github.com/LabeoFD/SNPutils
+URL: https://github.com/LabeoFD/SNPutils, https://labeofd.github.io/SNPutils/
 BugReports: https://github.com/LabeoFD/SNPutils/issues
 VignetteBuilder: knitr

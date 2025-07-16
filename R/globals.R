@@ -5,3 +5,5 @@ utils::globalVariables(c(
   "probeset_id", "rule2_check", "rule3_check", "rule4_check", "rule5_check",
   "violations"
 ))
+
+utils::globalVariables(c(".", "cel_files", "total_call_rate", "Call_Rate"))
