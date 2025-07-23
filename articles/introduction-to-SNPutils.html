@@ -47,13 +47,14 @@
 
 
 
-<script src="introduction-to-SNPutils_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+
+<div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>introduction-to-SNPutils</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/LabeoFD/SNPutils/blob/HEAD/vignettes/introduction-to-SNPutils.Rmd" class="external-link"><code>vignettes/introduction-to-SNPutils.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/LabeoFD/SNPutils/blob/master/vignettes/introduction-to-SNPutils.Rmd" class="external-link"><code>vignettes/introduction-to-SNPutils.Rmd</code></a></small>
       <div class="d-none name"><code>introduction-to-SNPutils.Rmd</code></div>
     </div>
 
@@ -66,10 +67,12 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>SNPutils is an R package designed to convert numerical genotype data (0, 1, 2) to allele pairs. The package provides tools for:</p>
+<p>SNPutils is an R package designed to convert numerical genotype data
+(0, 1, 2) to allele pairs. The package provides tools for:</p>
 <ul>
 <li>Converting genotype codes to actual allele pairs</li>
-<li>Validating allele assignments according to standard genetic rules</li>
+<li>Validating allele assignments according to standard genetic
+rules</li>
 <li>Generating standardized output formats (TYP and COM)</li>
 <li>Handling indels (insertions/deletions) correctly</li>
 <li>Performing quality control checks on genotype data</li>
@@ -81,26 +84,28 @@
 <p>You can install SNPutils from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"LabeoFD/SNPutils"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Using GitHub PAT from the git credential store.</span></span>
-<span><span class="co">#&gt; Skipping install of 'SNPutils' from a github remote, the SHA1 (669c82dc) has not changed since last install.</span></span>
-<span><span class="co">#&gt;   Use `force = TRUE` to force installation</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"LabeoFD/SNPutils"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="basic-concepts">Basic Concepts<a class="anchor" aria-label="anchor" href="#basic-concepts"></a>
 </h2>
-<p>In genetic data processing, genotypes are often represented as numerical codes:</p>
+<p>In genetic data processing, genotypes are often represented as
+numerical codes:</p>
 <ul>
 <li>0: Homozygous for the first allele (A/A)</li>
 <li>1: Heterozygous (A/B)</li>
 <li>2: Homozygous for the second allele (B/B)</li>
 </ul>
-<p>These codes are convenient for computation. SNPutils converts these codes back to biologically meaningful allele pairs using annotation data that specifies which nucleotides (A, C, G, T) correspond to each allele.</p>
+<p>These codes are convenient for computation. SNPutils converts these
+codes back to biologically meaningful allele pairs using annotation data
+that specifies which nucleotides (A, C, G, T) correspond to each
+allele.</p>
 </div>
 <div class="section level2">
 <h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
-<p>SNPutils comes with example datasets to demonstrate its functionality:</p>
+<p>SNPutils comes with example datasets to demonstrate its
+functionality:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/LabeoFD/SNPutils" class="external-link">SNPutils</a></span><span class="op">)</span></span>
 <span></span>
@@ -111,16 +116,17 @@
 <span><span class="co"># Examine the genotype data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">example_genotypes</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   probeset_id Sample1 Sample2 Sample3</span></span>
-<span><span class="co">#&gt; 1        SNP1       0       2       0</span></span>
-<span><span class="co">#&gt; 2        SNP2       0       2       1</span></span>
-<span><span class="co">#&gt; 3        SNP3       1       1       1</span></span>
-<span><span class="co">#&gt; 4        SNP4       1       1       2</span></span>
-<span><span class="co">#&gt; 5        SNP5       0       1       0</span></span>
-<span><span class="co">#&gt; 6        SNP6       0       1       0</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        SNP1       0       2       2</span></span>
+<span><span class="co">#&gt; 2        SNP2       0       1       1</span></span>
+<span><span class="co">#&gt; 3        SNP3       1       1       0</span></span>
+<span><span class="co">#&gt; 4        SNP4       1       0       2</span></span>
+<span><span class="co">#&gt; 5        SNP5       2       0       0</span></span>
+<span><span class="co">#&gt; 6        SNP6       1       1       2</span></span></code></pre></div>
 <p>The genotype data contains:</p>
 <ul>
 <li>A <code>probeset_id</code> column with SNP identifiers</li>
-<li>Columns for each sample (Sample1, Sample2, Sample3) with genotype codes (0, 1, 2)</li>
+<li>Columns for each sample (Sample1, Sample2, Sample3) with genotype
+codes (0, 1, 2)</li>
 </ul>
 </div>
 <div class="section level2">
@@ -129,20 +135,24 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">example_annotations</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Probe.Set.ID Chromosome Physical.Position Allele.A Allele.B</span></span>
-<span><span class="co">#&gt; 1         SNP1         10          43550342        A        C</span></span>
-<span><span class="co">#&gt; 2         SNP2          X          73865503        A        C</span></span>
-<span><span class="co">#&gt; 3         SNP3         22          99353247        T        C</span></span>
-<span><span class="co">#&gt; 4         SNP4         17          52692942        A        C</span></span>
-<span><span class="co">#&gt; 5         SNP5          2          66627319        A        C</span></span>
-<span><span class="co">#&gt; 6         SNP6         15          36576624        A        C</span></span></code></pre></div>
+<span><span class="co">#&gt; 1         SNP1          9          35958693        T        G</span></span>
+<span><span class="co">#&gt; 2         SNP2         11          61564642        A        C</span></span>
+<span><span class="co">#&gt; 3         SNP3         19          99793111        A        C</span></span>
+<span><span class="co">#&gt; 4         SNP4         14          22319761        T        G</span></span>
+<span><span class="co">#&gt; 5         SNP5         16          41066538        A        G</span></span>
+<span><span class="co">#&gt; 6         SNP6         13          20182616        T        C</span></span></code></pre></div>
 <p>The annotation data contains:</p>
 <ul>
-<li>A <code>Probe.Set.ID</code> column matching the probeset_id values</li>
+<li>A <code>Probe.Set.ID</code> column matching the probeset_id
+values</li>
 <li>Chromosome and position information</li>
 <li>
-<code>Allele.A</code> and <code>Allele.B</code> columns specifying the nucleotides</li>
+<code>Allele.A</code> and <code>Allele.B</code> columns specifying
+the nucleotides</li>
 </ul>
-<p>The example data contains both standard SNPs and indels. For indels, the <code>Allele.A</code> column contains a deletion marker (“-”) and <code>Allele.B</code> contains the insertion sequence.</p>
+<p>The example data contains both standard SNPs and indels. For indels,
+the <code>Allele.A</code> column contains a deletion marker (“-”) and
+<code>Allele.B</code> contains the insertion sequence.</p>
 </div>
 <div class="section level2">
 <h2 id="core-functionality">Core Functionality<a class="anchor" aria-label="anchor" href="#core-functionality"></a>
@@ -151,7 +161,8 @@
 <div class="section level2">
 <h2 id="converting-genotypes-to-alleles">Converting Genotypes to Alleles<a class="anchor" aria-label="anchor" href="#converting-genotypes-to-alleles"></a>
 </h2>
-<p>The main function genotype2allele() converts numeric genotype codes to allele pairs:</p>
+<p>The main function genotype2allele() converts numeric genotype codes
+to allele pairs:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allele.html">genotype2allele</a></span><span class="op">(</span><span class="va">example_genotypes</span>, <span class="va">example_annotations</span><span class="op">)</span></span>
@@ -163,8 +174,8 @@
 <span><span class="co">#&gt;  $ validation:List of 2</span></span>
 <span><span class="co">#&gt;   ..$ allele_validation: tibble [20 × 12] (S3: tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   .. ..$ probeset_id : chr [1:20] "SNP1" "SNP10" "SNP11" "SNP12" ...</span></span>
-<span><span class="co">#&gt;   .. ..$ allele_a    : chr [1:20] "A" "T" "-" "-" ...</span></span>
-<span><span class="co">#&gt;   .. ..$ allele_b    : chr [1:20] "C" "C" "A" "G" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ allele_a    : chr [1:20] "T" "T" "-" "-" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ allele_b    : chr [1:20] "G" "C" "A" "G" ...</span></span>
 <span><span class="co">#&gt;   .. ..$ is_indel    : logi [1:20] FALSE FALSE TRUE TRUE TRUE TRUE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ is_multibase: logi [1:20] FALSE FALSE FALSE FALSE FALSE FALSE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ is_AT_SNP   : logi [1:20] FALSE FALSE FALSE FALSE FALSE FALSE ...</span></span>
@@ -174,8 +185,6 @@
 <span><span class="co">#&gt;   .. ..$ rule3_check : logi [1:20] TRUE TRUE TRUE TRUE TRUE TRUE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ rule4_check : logi [1:20] TRUE TRUE TRUE TRUE TRUE TRUE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ rule5_check : logi [1:20] TRUE TRUE TRUE TRUE TRUE TRUE ...</span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; </span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, "sorted")= chr "Probe.Set.ID"</span></span>
 <span><span class="co">#&gt;   ..$ rule_violations  : tibble [0 × 13] (S3: tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   .. ..$ probeset_id : chr(0) </span></span>
 <span><span class="co">#&gt;   .. ..$ allele_a    : chr(0) </span></span>
@@ -190,17 +199,17 @@
 <span><span class="co">#&gt;   .. ..$ rule4_check : logi(0) </span></span>
 <span><span class="co">#&gt;   .. ..$ rule5_check : logi(0) </span></span>
 <span><span class="co">#&gt;   .. ..$ violations  : chr(0) </span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; </span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, "sorted")= chr "Probe.Set.ID"</span></span>
 <span><span class="co">#&gt;  $ results   :Classes 'data.table' and 'data.frame': 60 obs. of  3 variables:</span></span>
 <span><span class="co">#&gt;   ..$ probeset_id    : chr [1:60] "SNP1" "SNP1" "SNP1" "SNP10" ...</span></span>
 <span><span class="co">#&gt;   ..$ Sample_ID      : chr [1:60] "Sample1" "Sample2" "Sample3" "Sample1" ...</span></span>
-<span><span class="co">#&gt;   ..$ allele_genotype: chr [1:60] "A/A" "C/C" "A/A" "C/C" ...</span></span>
+<span><span class="co">#&gt;   ..$ allele_genotype: chr [1:60] "T/T" "G/G" "G/G" "T/T" ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></span></code></pre></div>
-<p>The <code><a href="../reference/genotype2allele.html">genotype2allele()</a></code> function returns a list with two components:</p>
+<p>The <code><a href="../reference/genotype2allele.html">genotype2allele()</a></code> function returns a list with two
+components:</p>
 <ul>
 <li>
-<code>validation</code>: Contains validation results and rule violations</li>
+<code>validation</code>: Contains validation results and rule
+violations</li>
 <li>
 <code>results</code>: Contains the converted genotype data</li>
 </ul>
@@ -210,19 +219,19 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
 <span><span class="co">#&gt;         &lt;char&gt;    &lt;char&gt;          &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:        SNP1   Sample1             A/A</span></span>
-<span><span class="co">#&gt; 2:        SNP1   Sample2             C/C</span></span>
-<span><span class="co">#&gt; 3:        SNP1   Sample3             A/A</span></span>
-<span><span class="co">#&gt; 4:       SNP10   Sample1             C/C</span></span>
-<span><span class="co">#&gt; 5:       SNP10   Sample2             T/T</span></span>
+<span><span class="co">#&gt; 1:        SNP1   Sample1             T/T</span></span>
+<span><span class="co">#&gt; 2:        SNP1   Sample2             G/G</span></span>
+<span><span class="co">#&gt; 3:        SNP1   Sample3             G/G</span></span>
+<span><span class="co">#&gt; 4:       SNP10   Sample1             T/T</span></span>
+<span><span class="co">#&gt; 5:       SNP10   Sample2             T/C</span></span>
 <span><span class="co">#&gt; 6:       SNP10   Sample3             C/C</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 2</span></span>
 <span><span class="co">#&gt;  $ validation:List of 2</span></span>
 <span><span class="co">#&gt;   ..$ allele_validation: tibble [20 × 12] (S3: tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   .. ..$ probeset_id : chr [1:20] "SNP1" "SNP10" "SNP11" "SNP12" ...</span></span>
-<span><span class="co">#&gt;   .. ..$ allele_a    : chr [1:20] "A" "T" "-" "-" ...</span></span>
-<span><span class="co">#&gt;   .. ..$ allele_b    : chr [1:20] "C" "C" "A" "G" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ allele_a    : chr [1:20] "T" "T" "-" "-" ...</span></span>
+<span><span class="co">#&gt;   .. ..$ allele_b    : chr [1:20] "G" "C" "A" "G" ...</span></span>
 <span><span class="co">#&gt;   .. ..$ is_indel    : logi [1:20] FALSE FALSE TRUE TRUE TRUE TRUE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ is_multibase: logi [1:20] FALSE FALSE FALSE FALSE FALSE FALSE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ is_AT_SNP   : logi [1:20] FALSE FALSE FALSE FALSE FALSE FALSE ...</span></span>
@@ -232,8 +241,6 @@
 <span><span class="co">#&gt;   .. ..$ rule3_check : logi [1:20] TRUE TRUE TRUE TRUE TRUE TRUE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ rule4_check : logi [1:20] TRUE TRUE TRUE TRUE TRUE TRUE ...</span></span>
 <span><span class="co">#&gt;   .. ..$ rule5_check : logi [1:20] TRUE TRUE TRUE TRUE TRUE TRUE ...</span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; </span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, "sorted")= chr "Probe.Set.ID"</span></span>
 <span><span class="co">#&gt;   ..$ rule_violations  : tibble [0 × 13] (S3: tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   .. ..$ probeset_id : chr(0) </span></span>
 <span><span class="co">#&gt;   .. ..$ allele_a    : chr(0) </span></span>
@@ -248,20 +255,26 @@
 <span><span class="co">#&gt;   .. ..$ rule4_check : logi(0) </span></span>
 <span><span class="co">#&gt;   .. ..$ rule5_check : logi(0) </span></span>
 <span><span class="co">#&gt;   .. ..$ violations  : chr(0) </span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, ".internal.selfref")=&lt;externalptr&gt; </span></span>
-<span><span class="co">#&gt;   .. ..- attr(*, "sorted")= chr "Probe.Set.ID"</span></span>
 <span><span class="co">#&gt;  $ results   :Classes 'data.table' and 'data.frame': 60 obs. of  3 variables:</span></span>
 <span><span class="co">#&gt;   ..$ probeset_id    : chr [1:60] "SNP1" "SNP1" "SNP1" "SNP10" ...</span></span>
 <span><span class="co">#&gt;   ..$ Sample_ID      : chr [1:60] "Sample1" "Sample2" "Sample3" "Sample1" ...</span></span>
-<span><span class="co">#&gt;   ..$ allele_genotype: chr [1:60] "A/A" "C/C" "A/A" "C/C" ...</span></span>
+<span><span class="co">#&gt;   ..$ allele_genotype: chr [1:60] "T/T" "G/G" "G/G" "T/T" ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></span></code></pre></div>
-<p>For each genotype, the function has created an <code>allele_genotype</code> showing the actual nucleotide alleles.</p>
+<p>For each genotype, the function has created an
+<code>allele_genotype</code> showing the actual nucleotide alleles.</p>
 </div>
 <div class="section level2">
 <h2 id="validating-allele-assignments">Validating Allele Assignments<a class="anchor" aria-label="anchor" href="#validating-allele-assignments"></a>
 </h2>
-<p>SNPutils automatically validates allele assignments according to standard rules:</p>
-<p><strong>Rule 1</strong>: SNPs are fixed on the forward strand of the design-time reference genome <strong>Rule 2</strong>: For AT/CG SNPs, alleles should be in alphabetical order <strong>Rule 3</strong>: For other SNPs, Allele.A should be A or T, and Allele.B should be C or G <strong>Rule 4</strong>: For indels, Allele.B should not be a deletion marker <strong>Rule 5</strong>: For multi-base alleles, alleles should be in alphabetical order</p>
+<p>SNPutils automatically validates allele assignments according to
+standard rules:</p>
+<p><strong>Rule 1</strong>: SNPs are fixed on the forward strand of the
+design-time reference genome <strong>Rule 2</strong>: For AT/CG SNPs,
+alleles should be in alphabetical order <strong>Rule 3</strong>: For
+other SNPs, Allele.A should be A or T, and Allele.B should be C or G
+<strong>Rule 4</strong>: For indels, Allele.B should not be a deletion
+marker <strong>Rule 5</strong>: For multi-base alleles, alleles should
+be in alphabetical order</p>
 <p>Let’s check if any validation issues were found:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check for validation issues</span></span>
@@ -271,12 +284,86 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"No validation issues found\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; No validation issues found</span></span></code></pre></div>
+<div class="section level5">
+<h5 id="updated-function-genotype2allelev2">Updated function: <code>genotype2allelev2()</code><a class="anchor" aria-label="anchor" href="#updated-function-genotype2allelev2"></a>
+</h5>
+<p>The package also includes an updated version with additional
+features:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles using enhanced function</span></span>
+<span><span class="va">results_v2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allelev2.html">genotype2allelev2</a></span><span class="op">(</span><span class="va">example_genotypes</span>, <span class="va">example_annotations</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View the structure of the results</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">results_v2</span>, max.level <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt;  $ validation:List of 2</span></span>
+<span><span class="co">#&gt;   ..$ allele_validation: tibble [20 × 12] (S3: tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;   ..$ rule_violations  : tibble [0 × 13] (S3: tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;  $ results   :Classes 'data.table' and 'data.frame': 60 obs. of  3 variables:</span></span>
+<span><span class="co">#&gt;   ..$ probeset_id    : chr [1:60] "SNP1" "SNP1" "SNP1" "SNP10" ...</span></span>
+<span><span class="co">#&gt;   ..$ Sample_ID      : chr [1:60] "Sample1" "Sample2" "Sample3" "Sample1" ...</span></span>
+<span><span class="co">#&gt;   ..$ allele_genotype: chr [1:60] "T/T" "G/G" "G/G" "T/T" ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></span></code></pre></div>
+<p><strong>Key improvements in v2:</strong> - Space-to-dash conversion
+for alleles - Missing genotype handling (-1 → “–”) - Extended indel
+detection for multi-character alleles - Improved validation and error
+handling</p>
+<p>Let’s examine the conversion results:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Look at the first few rows of the results (using v2)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
+<span><span class="co">#&gt;         &lt;char&gt;    &lt;char&gt;          &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:        SNP1   Sample1             T/T</span></span>
+<span><span class="co">#&gt; 2:        SNP1   Sample2             G/G</span></span>
+<span><span class="co">#&gt; 3:        SNP1   Sample3             G/G</span></span>
+<span><span class="co">#&gt; 4:       SNP10   Sample1             T/T</span></span>
+<span><span class="co">#&gt; 5:       SNP10   Sample2             T/C</span></span>
+<span><span class="co">#&gt; 6:       SNP10   Sample3             C/C</span></span></code></pre></div>
+<p>For each genotype, the function has created an
+<code>allele_genotype</code> showing the actual nucleotide alleles.</p>
+</div>
+<div class="section level4">
+<h4 id="validating-allele-assignments-1">Validating Allele Assignments<a class="anchor" aria-label="anchor" href="#validating-allele-assignments-1"></a>
+</h4>
+<p>SNPutils automatically validates allele assignments according to
+standard rules:</p>
+<ul>
+<li>
+<strong>Rule 1</strong>: SNPs are fixed on the forward strand of the
+design-time reference genome</li>
+<li>
+<strong>Rule 2</strong>: For AT/CG SNPs, alleles should be in
+alphabetical order</li>
+<li>
+<strong>Rule 3</strong>: For other SNPs, Allele.A should be A or T,
+and Allele.B should be C or G</li>
+<li>
+<strong>Rule 4</strong>: For indels, Allele.B should not be a
+deletion marker</li>
+<li>
+<strong>Rule 5</strong>: For multi-base alleles, alleles should be
+in alphabetical order</li>
+</ul>
+<p>Let’s check if any validation issues were found:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Check for validation issues</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"No validation issues found\n"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; No validation issues found</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="converting-to-typ-format">Converting to TYP Format<a class="anchor" aria-label="anchor" href="#converting-to-typ-format"></a>
 </h2>
-<p>The <code><a href="../reference/allele2typ.html">allele2typ()</a></code> function converts the results to TYP format: <strong>NOTE: It’s a TYP format missing the header (Pre-TYP)</strong></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>The <code><a href="../reference/allele2typ.html">allele2typ()</a></code> function converts the results to TYP
+format: <strong>NOTE: It’s a TYP format missing the header
+(Pre-TYP)</strong></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert to TYP format</span></span>
 <span><span class="va">typ_format</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/allele2typ.html">allele2typ</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span></span>
@@ -284,11 +371,11 @@
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">typ_format</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Sample_ID SNP_Name Allele1_Forward Allele2_Forward</span></span>
 <span><span class="co">#&gt;       &lt;char&gt;   &lt;char&gt;          &lt;char&gt;          &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:   Sample1     SNP1               A               A</span></span>
-<span><span class="co">#&gt; 2:   Sample2     SNP1               C               C</span></span>
-<span><span class="co">#&gt; 3:   Sample3     SNP1               A               A</span></span>
-<span><span class="co">#&gt; 4:   Sample1    SNP10               C               C</span></span>
-<span><span class="co">#&gt; 5:   Sample2    SNP10               T               T</span></span>
+<span><span class="co">#&gt; 1:   Sample1     SNP1               T               T</span></span>
+<span><span class="co">#&gt; 2:   Sample2     SNP1               G               G</span></span>
+<span><span class="co">#&gt; 3:   Sample3     SNP1               G               G</span></span>
+<span><span class="co">#&gt; 4:   Sample1    SNP10               T               T</span></span>
+<span><span class="co">#&gt; 5:   Sample2    SNP10               T               C</span></span>
 <span><span class="co">#&gt; 6:   Sample3    SNP10               C               C</span></span></code></pre></div>
 <p>The TYP format includes:</p>
 <ul>
@@ -297,24 +384,67 @@
 <li>
 <code>SNP_Name</code>: SNP identifier</li>
 <li>
-<code>Allele1_Forward</code> and <code>Allele2_Forward</code>: The two alleles</li>
+<code>Allele1_Forward</code> and <code>Allele2_Forward</code>: The
+two alleles</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="handling-special-cases">Handling Special Cases<a class="anchor" aria-label="anchor" href="#handling-special-cases"></a>
+</h2>
+<div class="section level4">
+<h4 id="missing-genotypes">Missing Genotypes<a class="anchor" aria-label="anchor" href="#missing-genotypes"></a>
+</h4>
+<p>The enhanced function handles missing genotypes (-1) gracefully:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create test data with missing genotype</span></span>
+<span><span class="va">test_genotypes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  probeset_id <span class="op">=</span> <span class="st">"SNP1"</span>,</span>
+<span>  Sample1 <span class="op">=</span> <span class="op">-</span><span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">test_annotations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  Probe.Set.ID <span class="op">=</span> <span class="st">"SNP1"</span>,</span>
+<span>  Chromosome <span class="op">=</span> <span class="st">"1"</span>,</span>
+<span>  Physical.Position <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  Allele.A <span class="op">=</span> <span class="st">"A"</span>,</span>
+<span>  Allele.B <span class="op">=</span> <span class="st">"G"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Convert with missing genotype</span></span>
+<span><span class="va">result_missing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allelev2.html">genotype2allelev2</a></span><span class="op">(</span><span class="va">test_genotypes</span>, <span class="va">test_annotations</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">result_missing</span><span class="op">$</span><span class="va">results</span></span>
+<span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
+<span><span class="co">#&gt;         &lt;char&gt;    &lt;char&gt;          &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:        SNP1   Sample1              --</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="handling-indels">Handling Indels<a class="anchor" aria-label="anchor" href="#handling-indels"></a>
 </h2>
 <p>Let’s focus on how SNPutils handles indels:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Filter for indels (SNP11-SNP20 in our example data)</span></span>
 <span><span class="va">indel_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"SNP1[1-9]|SNP20"</span>, <span class="va">probeset_id</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">indel_results</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
 <span><span class="co">#&gt;         &lt;char&gt;    &lt;char&gt;          &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1:       SNP11   Sample1             D/D</span></span>
-<span><span class="co">#&gt; 2:       SNP11   Sample2             D/D</span></span>
-<span><span class="co">#&gt; 3:       SNP11   Sample3             D/I</span></span>
-<span><span class="co">#&gt; 4:       SNP12   Sample1             I/I</span></span>
-<span><span class="co">#&gt; 5:       SNP12   Sample2             I/I</span></span>
+<span><span class="co">#&gt; 2:       SNP11   Sample2             I/I</span></span>
+<span><span class="co">#&gt; 3:       SNP11   Sample3             D/D</span></span>
+<span><span class="co">#&gt; 4:       SNP12   Sample1             D/I</span></span>
+<span><span class="co">#&gt; 5:       SNP12   Sample2             D/D</span></span>
+<span><span class="co">#&gt; 6:       SNP12   Sample3             D/I</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Filter for indels (SNP11-SNP20 in our example data)</span></span>
+<span><span class="va">indel_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"SNP1[1-9]|SNP20"</span>, <span class="va">probeset_id</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">indel_results</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
+<span><span class="co">#&gt;         &lt;char&gt;    &lt;char&gt;          &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:       SNP11   Sample1             D/D</span></span>
+<span><span class="co">#&gt; 2:       SNP11   Sample2             I/I</span></span>
+<span><span class="co">#&gt; 3:       SNP11   Sample3             D/D</span></span>
+<span><span class="co">#&gt; 4:       SNP12   Sample1             D/I</span></span>
+<span><span class="co">#&gt; 5:       SNP12   Sample2             D/D</span></span>
 <span><span class="co">#&gt; 6:       SNP12   Sample3             D/I</span></span></code></pre></div>
 <p>For indels, the genotype codes are interpreted as:</p>
 <ul>
@@ -322,17 +452,67 @@
 <li>1: D/I (heterozygous deletion/insertion)</li>
 <li>2: I/I (homozygous insertion)</li>
 </ul>
+<div class="section level3">
+<h3 id="function-comparison">Function Comparison<a class="anchor" aria-label="anchor" href="#function-comparison"></a>
+</h3>
+<table class="table">
+<thead><tr class="header">
+<th>Feature</th>
+<th><code><a href="../reference/genotype2allele.html">genotype2allele()</a></code></th>
+<th><code><a href="../reference/genotype2allelev2.html">genotype2allelev2()</a></code></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Basic conversion</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="even">
+<td>Validation</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr class="odd">
+<td>Missing genotype handling</td>
+<td>Limited</td>
+<td>✓ (-1 → “–”)</td>
+</tr>
+<tr class="even">
+<td>Space-to-dash conversion</td>
+<td>✗</td>
+<td>✓</td>
+</tr>
+<tr class="odd">
+<td>Extended indel detection</td>
+<td>Basic</td>
+<td>✓ (multi-character)</td>
+</tr>
+<tr class="even">
+<td>Error handling</td>
+<td>Basic</td>
+<td>Basic</td>
+</tr>
+<tr class="odd">
+<td>Performance</td>
+<td>Standard</td>
+<td>Standard</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section level2">
 <h2 id="working-with-your-own-data">Working with Your Own Data<a class="anchor" aria-label="anchor" href="#working-with-your-own-data"></a>
 </h2>
 <p>To use SNPutils with your own data, follow these steps:</p>
 <ol style="list-style-type: decimal">
-<li>Read Your Genotype Data Use <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_delim()</a></code> or similar to read your genotype data, especially if you need to skip header lines:</li>
+<li>Read Your Genotype Data Use <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_delim()</a></code> or
+similar to read your genotype data, especially if you need to skip
+header lines:</li>
 </ol>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read genotype data</span></span>
-<span><span class="va">genotype_data</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_delim</a></span><span class="op">(</span></span>
+<span><span class="va">genotype_data</span> <span class="op">&lt;-</span> <span class="fu">read_delim</span><span class="op">(</span></span>
 <span>  <span class="st">"path/to/genotype.txt"</span>,</span>
 <span>  delim <span class="op">=</span> <span class="st">"\t"</span>,</span>
 <span>  skip <span class="op">=</span> <span class="fl">583</span>,  <span class="co"># Adjust based on your file structure</span></span>
@@ -349,11 +529,11 @@
 <li>Check and Prepare Your Data</li>
 </ol>
 <p>Ensure your data has the required column names:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># For genotype data, ensure there's a column named "probeset_id"</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"probeset_id"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">genotype_data</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Rename the appropriate column</span></span>
-<span>  <span class="va">genotype_data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="va">genotype_data</span>, probeset_id <span class="op">=</span> <span class="va">your_id_column_name</span><span class="op">)</span></span>
+<span>  <span class="va">genotype_data</span> <span class="op">&lt;-</span> <span class="fu">rename</span><span class="op">(</span><span class="va">genotype_data</span>, probeset_id <span class="op">=</span> <span class="va">your_id_column_name</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># For annotation data, ensure there are columns named "Probe.Set.ID", "Allele.A", and "Allele.B"</span></span>
@@ -366,9 +546,22 @@
 <ol start="3" style="list-style-type: decimal">
 <li>Process Your Data Convert genotypes to alleles:</li>
 </ol>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allele.html">genotype2allele</a></span><span class="op">(</span><span class="va">genotype_data</span>, <span class="va">annotation_data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check for validation issues</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span>, <span class="st">"validation issues"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Convert to TYP format</span></span>
+<span><span class="va">typ_format</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/allele2typ.html">allele2typ</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
+<p>Using the updated function <code><a href="../reference/genotype2allelev2.html">genotype2allelev2()</a></code>:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles using enhanced function</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allelev2.html">genotype2allelev2</a></span><span class="op">(</span><span class="va">genotype_data</span>, <span class="va">annotation_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Check for validation issues</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
@@ -381,7 +574,7 @@
 <ol start="4" style="list-style-type: decimal">
 <li>Save Your Results Write the results to a file:</li>
 </ol>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Write TYP format to a file</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">typ_format</span>, <span class="st">"output_typ.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -396,7 +589,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
