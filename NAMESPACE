@@ -3,6 +3,7 @@
 export(allele2typ)
 export(create_com_file)
 export(genotype2allele)
+export(genotype2allelev2)
 import(dplyr)
 import(lubridate)
 import(purrr)
