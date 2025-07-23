@@ -21,17 +21,20 @@ navbar:
       icon: fab fa-github
       href: https://github.com/LabeoFD/SNPutils
 reference:
-- title: Core Functions
-  desc: Main functions for converting genotype codes to allele pairs
+- title: Main Functions
+  desc: Core functionality for genotype conversion
   contents:
   - genotype2allele
   - genotype2allelev2
   - allele2typ
-- title: Example Datasets
-  desc: Example data included with the package
+  - create_com_file
+
+- title: Example Data
+  desc: Datasets for demonstration
   contents:
   - example_genotypes
   - example_annotations
+  - example_axiom_report
 articles:
 - title: Getting Started
   contents: introduction-to-SNPutils
