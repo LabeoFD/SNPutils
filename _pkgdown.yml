@@ -1,0 +1,37 @@
+url: https://labeofd.github.io/SNPutils/
+title: SNPutils
+description: Tools for converting numerical genotype data (0, 1, 2) to allele pairs
+template:
+  bootstrap: 5
+  bootswatch: flatly
+navbar:
+  structure:
+    left:
+    - intro
+    - reference
+    - articles
+    right:
+    - search
+    - github
+  components:
+    intro:
+      text: Get started
+      href: articles/introduction-to-SNPutils.html
+    github:
+      icon: fab fa-github
+      href: https://github.com/LabeoFD/SNPutils
+reference:
+- title: Core Functions
+  desc: Main functions for converting genotype codes to allele pairs
+  contents:
+  - genotype2allele
+  - allele2typ
+- title: Example Datasets
+  desc: Example data included with the package
+  contents:
+  - example_genotypes
+  - example_annotations
+articles:
+- title: Getting Started
+  contents: introduction-to-SNPutils
+
