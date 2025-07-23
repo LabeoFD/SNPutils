@@ -1,0 +1,330 @@
+---
+title: "introduction-to-SNPutils"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction-to-SNPutils}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction to SNPutils
+# Overview
+SNPutils is an R package designed to convert numerical genotype data (0, 1, 2) to allele pairs. The package provides tools for:
+
+- Converting genotype codes to actual allele pairs
+- Validating allele assignments according to standard genetic rules
+- Generating standardized output formats (TYP and COM)
+- Handling indels (insertions/deletions) correctly
+- Performing quality control checks on genotype data
+
+# Installation
+You can install SNPutils from GitHub:
+
+```{r install,eval=FALSE}
+# install.packages("remotes")
+remotes::install_github("LabeoFD/SNPutils")
+```
+
+# Basic Concepts
+In genetic data processing, genotypes are often represented as numerical codes:
+
+- 0: Homozygous for the first allele (A/A)
+- 1: Heterozygous (A/B)
+- 2: Homozygous for the second allele (B/B)
+
+These codes are convenient for computation. SNPutils converts these codes back to biologically meaningful allele pairs using annotation data that specifies which nucleotides (A, C, G, T) correspond to each allele.
+
+# Example Data
+SNPutils comes with example datasets to demonstrate its functionality:
+
+```{r exampleGeno}
+library(SNPutils)
+
+# Load the example data
+data(example_genotypes)
+data(example_annotations)
+
+# Examine the genotype data
+head(example_genotypes)
+```
+The genotype data contains:
+
+- A `probeset_id` column with SNP identifiers
+- Columns for each sample (Sample1, Sample2, Sample3) with genotype codes (0, 1, 2)
+
+# Examine the annotation data
+```{r exampleAnnot}
+head(example_annotations)
+```
+The annotation data contains:
+
+- A `Probe.Set.ID` column matching the probeset_id values
+- Chromosome and position information
+- `Allele.A` and `Allele.B` columns specifying the nucleotides
+
+The example data contains both standard SNPs and indels. For indels, the `Allele.A` column contains a deletion marker ("-") and `Allele.B` contains the insertion sequence.
+
+# Core Functionality
+# Converting Genotypes to Alleles
+The main function genotype2allele() converts numeric genotype codes to allele pairs:
+
+```{r Geno2Alles}
+# Convert genotypes to alleles
+results <- genotype2allele(example_genotypes, example_annotations)
+
+# View the structure of the results
+str(results)
+```
+
+The `genotype2allele()` function returns a list with two components:
+
+- `validation`: Contains validation results and rule violations
+- `results`: Contains the converted genotype data
+
+Let's examine the conversion results:
+
+```{r resulst}
+# Look at the first few rows of the results
+head(results$results)
+str(results)
+```
+For each genotype, the function has created an `allele_genotype` showing the actual nucleotide alleles.
+
+# Validating Allele Assignments
+SNPutils automatically validates allele assignments according to standard rules:
+
+**Rule 1**: SNPs are fixed on the forward strand of the design-time reference genome
+**Rule 2**: For AT/CG SNPs, alleles should be in alphabetical order
+**Rule 3**: For other SNPs, Allele.A should be A or T, and Allele.B should be C or G
+**Rule 4**: For indels, Allele.B should not be a deletion marker
+**Rule 5**: For multi-base alleles, alleles should be in alphabetical order
+
+Let's check if any validation issues were found:
+
+```{r ValidationIssues}
+# Check for validation issues
+if (!is.null(results$validation$rule_violations) && nrow(results$validation$rule_violations) > 0) {
+  head(results$validation$rule_violations)
+} else {
+  cat("No validation issues found\n")
+}
+```
+
+#### Updated function: `genotype2allelev2()` 
+
+The package also includes an updated version with additional features:
+
+```{r Geno2Allesv2}
+# Convert genotypes to alleles using enhanced function
+results_v2 <- genotype2allelev2(example_genotypes, example_annotations, verbose = FALSE)
+
+# View the structure of the results
+str(results_v2, max.level = 2)
+```
+
+**Key improvements in v2:**
+- Space-to-dash conversion for alleles
+- Missing genotype handling (-1 → "--")
+- Extended indel detection for multi-character alleles
+- Improved validation and error handling
+
+Let's examine the conversion results:
+
+```{r results}
+# Look at the first few rows of the results (using v2)
+head(results_v2$results)
+```
+
+For each genotype, the function has created an `allele_genotype` showing the actual nucleotide alleles.
+
+
+### Validating Allele Assignments
+SNPutils automatically validates allele assignments according to standard rules:
+
+- **Rule 1**: SNPs are fixed on the forward strand of the design-time reference genome
+- **Rule 2**: For AT/CG SNPs, alleles should be in alphabetical order
+- **Rule 3**: For other SNPs, Allele.A should be A or T, and Allele.B should be C or G
+- **Rule 4**: For indels, Allele.B should not be a deletion marker
+- **Rule 5**: For multi-base alleles, alleles should be in alphabetical order
+
+Let's check if any validation issues were found:
+
+```{r ValidationIssuesv2}
+# Check for validation issues
+if (!is.null(results_v2$validation$rule_violations) &&
+    nrow(results_v2$validation$rule_violations) > 0) {
+  head(results_v2$validation$rule_violations)
+} else {
+  cat("No validation issues found\n")
+}
+```
+
+# Converting to TYP Format
+The `allele2typ()` function converts the results to TYP format:
+**NOTE: It's a TYP format missing the header (Pre-TYP)**
+
+```{r Typ}
+# Convert to TYP format
+typ_format <- allele2typ(results)
+
+# View the TYP format data
+head(typ_format)
+```
+
+The TYP format includes:
+
+- `Sample_ID`: Sample identifier
+- `SNP_Name`: SNP identifier
+- `Allele1_Forward` and `Allele2_Forward`: The two alleles
+
+# Handling Special Cases
+
+### Missing Genotypes
+
+The enhanced function handles missing genotypes (-1) gracefully:
+
+```{r MissingGeno}
+# Create test data with missing genotype
+test_genotypes <- data.frame(
+  probeset_id = "SNP1",
+  Sample1 = -1
+)
+
+test_annotations <- data.frame(
+  Probe.Set.ID = "SNP1",
+  Chromosome = "1",
+  Physical.Position = 1000,
+  Allele.A = "A",
+  Allele.B = "G"
+)
+
+# Convert with missing genotype
+result_missing <- genotype2allelev2(test_genotypes, test_annotations, verbose = FALSE)
+result_missing$results
+```
+
+# Handling Indels
+
+Let's focus on how SNPutils handles indels:
+
+```{r Indels}
+# Filter for indels (SNP11-SNP20 in our example data)
+indel_results <- subset(results$results, grepl("SNP1[1-9]|SNP20", probeset_id))
+head(indel_results)
+```
+
+```{r Indelsv2}
+# Filter for indels (SNP11-SNP20 in our example data)
+indel_results <- subset(results_v2$results, grepl("SNP1[1-9]|SNP20", probeset_id))
+head(indel_results)
+```
+For indels, the genotype codes are interpreted as:
+
+- 0: D/D (homozygous deletion)
+- 1: D/I (heterozygous deletion/insertion)
+- 2: I/I (homozygous insertion)
+
+## Function Comparison
+
+| Feature | `genotype2allele()` | `genotype2allelev2()` |
+|---------|--------------------|-----------------------|
+| Basic conversion | ✓ | ✓ |
+| Validation | ✓ | ✓ |
+| Missing genotype handling | Limited | ✓ (-1 → "--") |
+| Space-to-dash conversion | ✗ | ✓ |
+| Extended indel detection | Basic | ✓ (multi-character) |
+| Error handling | Basic | Basic|
+| Performance | Standard | Standard |
+
+# Working with Your Own Data
+To use SNPutils with your own data, follow these steps:
+
+1. Read Your Genotype Data
+Use `readr::read_delim()` or similar to read your genotype data, especially if you need to skip header lines:
+
+```{r ReadData,eval=FALSE}
+# Read genotype data
+genotype_data <- read_delim(
+  "path/to/genotype.txt",
+  delim = "\t",
+  skip = 583,  # Adjust based on your file structure
+  col_names = TRUE
+)
+
+# Read annotation data
+annotation_data <- read.table(
+  "path/to/annotation.csv",
+  header = TRUE,
+  sep = ","
+)
+```
+
+2. Check and Prepare Your Data
+
+Ensure your data has the required column names:
+
+```{r CheckCols, eval=FALSE}
+# For genotype data, ensure there's a column named "probeset_id"
+if (!"probeset_id" %in% colnames(genotype_data)) {
+  # Rename the appropriate column
+  genotype_data <- rename(genotype_data, probeset_id = your_id_column_name)
+}
+
+# For annotation data, ensure there are columns named "Probe.Set.ID", "Allele.A", and "Allele.B"
+required_cols <- c("Probe.Set.ID", "Allele.A", "Allele.B")
+missing_cols <- required_cols[!required_cols %in% colnames(annotation_data)]
+if (length(missing_cols) > 0) {
+  stop("Required columns missing from annotation data: ",
+       paste(missing_cols, collapse = ", "))
+}
+```
+
+
+3. Process Your Data
+Convert genotypes to alleles:
+
+```{r ProcessData, eval=FALSE}
+# Convert genotypes to alleles
+results <- genotype2allele(genotype_data, annotation_data)
+
+# Check for validation issues
+if (nrow(results$validation$rule_violations) > 0) {
+  print(paste("Found", nrow(results$validation$rule_violations), "validation issues"))
+  head(results$validation$rule_violations)
+}
+
+# Convert to TYP format
+typ_format <- allele2typ(results)
+```
+
+Using the updated function `genotype2allelev2()`: 
+
+```{r ProcessDatav2, eval=FALSE}
+# Convert genotypes to alleles using enhanced function
+results <- genotype2allelev2(genotype_data, annotation_data)
+
+# Check for validation issues
+if (nrow(results$validation$rule_violations) > 0) {
+  print(paste("Found", nrow(results$validation$rule_violations), "validation issues"))
+  head(results$validation$rule_violations)
+}
+
+# Convert to TYP format
+typ_format <- allele2typ(results)
+```
+
+
+4. Save Your Results
+Write the results to a file:
+
+```{r SaveResults, eval=FALSE}
+# Write TYP format to a file
+write.csv(typ_format, "output_typ.csv", row.names = FALSE)
+```
