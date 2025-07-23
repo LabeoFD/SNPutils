@@ -25,6 +25,7 @@ reference:
   desc: Main functions for converting genotype codes to allele pairs
   contents:
   - genotype2allele
+  - genotype2allelev2
   - allele2typ
 - title: Example Datasets
   desc: Example data included with the package
