@@ -28,6 +28,7 @@ reference:
   - genotype2allelev2
   - allele2typ
   - create_com_file
+  - recode_genotypes
 
 - title: Example Data
   desc: Datasets for demonstration
