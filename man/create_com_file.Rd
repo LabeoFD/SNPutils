@@ -4,27 +4,36 @@
 \alias{create_com_file}
 \title{Create COM File from Axiom GT Report}
 \usage{
-create_com_file(file_path, call_rate_threshold = 0.95)
+create_com_file(
+  file_path,
+  call_rate_threshold = 0.95,
+  save_file = TRUE,
+  output_dir = "Documents/TYP-COM",
+  save_log = TRUE
+)
 }
 \arguments{
 \item{file_path}{Character string. Path to the AxiomGT report file (.txt)}
 
 \item{call_rate_threshold}{Numeric. Threshold for call rate quality (default: 0.95)}
+
+\item{save_file}{Logical. Whether to save the COM file with PASS samples only (default: TRUE)}
+
+\item{output_dir}{Character string. Output directory (default: "Documents/TYPE")}
+
+\item{save_log}{Logical. Whether to save processing log file (default: TRUE)}
 }
 \value{
-A list containing:
-\item{formatted_date}{Character string in DDMMYY format}
-\item{data}{Tibble with Sample ID, Call Rate, and Comment columns}
+A tibble containing all processed sample data
 }
 \description{
 Reads and processes an Axiom GT report file, extracting date information
-and sample call rate data with quality comments.
+and sample call rate data with quality comments and pass/fail status.
 }
 \examples{
 \dontrun{
 result <- create_com_file("path/to/AxiomGT1.report.txt")
-date <- result$formatted_date
-data <- result$data
+result <- create_com_file("file.txt", call_rate_threshold = 0.98, save_file = FALSE)
 }
 
 }
