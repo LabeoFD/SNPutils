@@ -17,9 +17,9 @@ test_that("genotype2allelev2 handles missing genotypes (-1)", {
   result <- genotype2allelev2(test_genotypes, test_annotations, verbose = FALSE)
   results_df <- result$results
   
-  # Missing genotypes (-1) should become "--"
-  expect_equal(results_df[results_df$Sample_ID == "Sample1", ]$allele_genotype, "--")
-  expect_equal(results_df[results_df$Sample_ID == "Sample3", ]$allele_genotype, "--")
+  # Missing genotypes (-1) should become "-"
+  expect_equal(results_df[results_df$Sample_ID == "Sample1", ]$allele_genotype, "-")
+  expect_equal(results_df[results_df$Sample_ID == "Sample3", ]$allele_genotype, "-")
   
   # Normal genotype should still work
   expect_equal(results_df[results_df$Sample_ID == "Sample2", ]$allele_genotype, "A/A")

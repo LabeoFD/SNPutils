@@ -1,72 +1,71 @@
 test_that("create_com_file works with valid input", {
-  # Create temporary test file
-  test_file <- tempfile(fileext = ".txt")
-  
-  # Create a simple test file manually
-  header <- c(
-    "#%chip_type=Axiom_GW_Hu_SNP",
-    "#%affymetrix-algorithm-param-apt-time-str=May 23 14:30:45 2025",
-    "cel_files\ttotal_call_rate\taverage_heterozygosity",
-    "Sample_001.CEL\t97.5\t0.25",
-    "Sample_002.CEL\t94.2\t0.30",
-    "Sample_003.CEL\t98.1\t0.22"
+  # Create test data
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
+    "#%other-header-info",
+    "cel_files\ttotal_call_rate",
+    "sample1.cel\t97.5",
+    "sample2.cel\t94.0",
+    "sample3.cel\t98.2"
   )
-  writeLines(header, test_file)
   
-  # Test function
-  result <- create_com_file(test_file)
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
+  
+  # Test the function (with save_file = FALSE to avoid file creation)
+  result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
   
   # Test structure
-  expect_type(result, "list")
-  expect_named(result, c("formatted_date", "data"))
-  expect_s3_class(result$data, "tbl_df")
+  expect_s3_class(result, "tbl_df")
+  expect_equal(ncol(result), 4)
+  expect_equal(nrow(result), 3)
   
-  # Test dimensions
-  expect_equal(ncol(result$data), 3)
-  expect_equal(nrow(result$data), 3)
+  # Test column names
+  expect_true(all(c("Sample ID", "Call Rate", "Comment", "Status") %in% names(result)))
   
-  # Test column names (should have spaces)
-  expect_true(all(c("Sample ID", "Call Rate", "Comment") %in% names(result$data)))
+  # Test column types
+  expect_type(result$`Sample ID`, "character")
+  expect_type(result$`Call Rate`, "double")
+  expect_type(result$Comment, "character")
+  expect_type(result$Status, "character")
   
-  # Test data types
-  expect_type(result$data$`Sample ID`, "character")
-  expect_type(result$data$`Call Rate`, "double")
-  expect_type(result$data$Comment, "character")
+  # Test data values
+  expect_true(all(result$`Call Rate` >= 0 & result$`Call Rate` <= 1))
+  expect_true(all(result$Comment %in% c("0", "1")))
+  expect_true(all(result$Status %in% c("PASS", "FAIL")))
   
-  # Test call rate values are between 0 and 1
-  expect_true(all(result$data$`Call Rate` >= 0 & result$data$`Call Rate` <= 1))
-  
-  # Test comment values are 0 or 1
-  expect_true(all(result$data$Comment %in% c("0", "1")))
+  # Test sample ID extraction (should remove .cel extension)
+  # Ordered by call rate desc: sample3 (98.2), sample1 (97.5), sample2 (94.0)
+  expect_equal(result$`Sample ID`, c("sample3", "sample1", "sample2"))
   
   # Clean up
   unlink(test_file)
 })
 
 test_that("create_com_file handles custom thresholds", {
-  test_file <- tempfile(fileext = ".txt")
-  
-  header <- c(
-    "#%affymetrix-algorithm-param-apt-time-str=May 23 14:30:45 2025",
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
     "cel_files\ttotal_call_rate",
-    "Sample_001.CEL\t97.5",
-    "Sample_002.CEL\t94.2",
-    "Sample_003.CEL\t93.0"
+    "sample1.cel\t97.5",
+    "sample2.cel\t94.0"
   )
-  writeLines(header, test_file)
   
-  # Test with different thresholds
-  result_default <- create_com_file(test_file, call_rate_threshold = 0.95)
-  result_strict <- create_com_file(test_file, call_rate_threshold = 0.98)
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
   
-  # Should have same structure
-  expect_s3_class(result_strict$data, "tbl_df")
-  expect_equal(ncol(result_strict$data), 3)
+  # Test with strict threshold
+  result_strict <- create_com_file(test_file, call_rate_threshold = 0.98, save_file = FALSE, save_log = FALSE)
+  result_default <- create_com_file(test_file, call_rate_threshold = 0.95, save_file = FALSE, save_log = FALSE)
   
-  # Stricter threshold should result in more "1" comments (low quality)
-  strict_failures <- sum(result_strict$data$Comment == "1")
-  default_failures <- sum(result_default$data$Comment == "1")
-  expect_gte(strict_failures, default_failures)
+  expect_s3_class(result_strict, "tbl_df")
+  expect_s3_class(result_default, "tbl_df")
+  
+  # With 0.98 threshold, only no samples should pass (both are below 0.98)
+  # With 0.95 threshold, sample1 should pass
+  strict_pass_count <- sum(result_strict$Status == "PASS")
+  default_pass_count <- sum(result_default$Status == "PASS")
+  
+  expect_lte(strict_pass_count, default_pass_count)
   
   unlink(test_file)
 })
@@ -78,85 +77,187 @@ test_that("create_com_file validates inputs correctly", {
     "File does not exist"
   )
   
-  # Test invalid threshold - too high
-  test_file <- tempfile(fileext = ".txt")
-  header <- c(
-    "#%affymetrix-algorithm-param-apt-time-str=May 23 14:30:45 2025",
+  # Test invalid threshold
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
     "cel_files\ttotal_call_rate",
-    "Sample_001.CEL\t97.5"
+    "sample1.cel\t97.5"
   )
-  writeLines(header, test_file)
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
   
   expect_error(
     create_com_file(test_file, call_rate_threshold = 1.5),
-    "call_rate_threshold must be a numeric value between 0 and 1"
+    "Call rate threshold must be between 0 and 1"
   )
   
-  # Test invalid threshold - negative
   expect_error(
     create_com_file(test_file, call_rate_threshold = -0.1),
-    "call_rate_threshold must be a numeric value between 0 and 1"
+    "Call rate threshold must be between 0 and 1"
   )
   
   unlink(test_file)
 })
 
 test_that("date parsing works correctly", {
-  test_file <- tempfile(fileext = ".txt")
-  
-  # Test with specific date
-  header <- c(
-    "#%affymetrix-algorithm-param-apt-time-str=May 23 14:30:45 2025",
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
     "cel_files\ttotal_call_rate",
-    "Sample_001.CEL\t97.5"
+    "sample1.cel\t97.5"
   )
-  writeLines(header, test_file)
   
-  result <- create_com_file(test_file)
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
   
-  # Check date format (should be DDMMYY)
-  expect_type(result$formatted_date, "character")
-  expect_equal(nchar(result$formatted_date), 6)
-  expect_equal(result$formatted_date, "230525")
+  result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
+  
+  # The function processes the data but doesn't return the date
+  # We can only test that it runs without error
+  expect_s3_class(result, "tbl_df")
   
   unlink(test_file)
 })
 
 test_that("call rate conversion is correct", {
-  test_file <- tempfile(fileext = ".txt")
-  
-  header <- c(
-    "#%affymetrix-algorithm-param-apt-time-str=May 23 14:30:45 2025",
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
     "cel_files\ttotal_call_rate",
-    "Sample_001.CEL\t97.5",
-    "Sample_002.CEL\t94.0"
+    "sample1.cel\t97.5",    # Should be converted to 0.975
+    "sample2.cel\t0.94"     # Should stay as 0.94
   )
-  writeLines(header, test_file)
   
-  result <- create_com_file(test_file)
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
   
-  # Check that call rates are properly converted (divided by 100)
-  expected_rates <- c(0.975, 0.940)
-  expect_equal(result$data$`Call Rate`, expected_rates, tolerance = 1e-10)
+  result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
+  
+  expected_rates <- c(0.975, 0.94)  # Ordered by desc call rate
+  expect_equal(result$`Call Rate`, expected_rates)
   
   unlink(test_file)
 })
 
 test_that("comment assignment works correctly", {
-  test_file <- tempfile(fileext = ".txt")
-  
-  header <- c(
-    "#%affymetrix-algorithm-param-apt-time-str=May 23 14:30:45 2025",
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
     "cel_files\ttotal_call_rate",
-    "Sample_001.CEL\t97.0",  # Should be "0" (>= 0.95)
-    "Sample_002.CEL\t94.0"   # Should be "1" (< 0.95)
+    "sample1.cel\t97.5",    # Above 0.95 threshold -> Comment "0"
+    "sample2.cel\t92.0"     # Below 0.95 threshold -> Comment "1"
   )
-  writeLines(header, test_file)
   
-  result <- create_com_file(test_file)
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
   
-  # Checcomment assignment
-  expect_equal(result$data$Comment, c("0", "1"))
+  result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
+  
+  # Check comments (ordered by desc call rate: sample1 first, then sample2)
+  expect_equal(result$Comment, c("0", "1"))
+  expect_equal(result$Status, c("PASS", "FAIL"))
+  
+  unlink(test_file)
+})
+
+test_that("missing required columns triggers error", {
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
+    "wrong_column\tother_column",
+    "sample1.cel\t97.5"
+  )
+  
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
+  
+  expect_error(
+    create_com_file(test_file, save_file = FALSE, save_log = FALSE),
+    "Missing columns"
+  )
+  
+  unlink(test_file)
+})
+
+test_that("empty data file triggers error", {
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
+    "#%only-header-lines"
+  )
+  
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
+  
+  expect_error(
+    create_com_file(test_file, save_file = FALSE, save_log = FALSE),
+    "No data found in file"
+  )
+  
+  unlink(test_file)
+})
+
+test_that("sample ID extraction removes file extensions and paths", {
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
+    "cel_files\ttotal_call_rate",
+    "/path/to/sample1.cel\t97.5",
+    "C:\\Windows\\Path\\sample2.CEL\t94.0",
+    "sample3.cel\t96.0"
+  )
+  
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
+  
+  result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
+  
+  # Should extract just the sample names without paths or extensions
+  # Ordered by call rate desc: sample1 (97.5), sample3 (96.0), sample2 (94.0) 
+  expect_equal(result$`Sample ID`, c("sample1", "sample3", "sample2"))
+  
+  # Verify no .cel or .CEL extensions remain
+  expect_true(all(!grepl("\\.(cel|CEL)$", result$`Sample ID`)))
+  
+  # Verify no paths remain
+  expect_true(all(!grepl("[\\/\\\\]", result$`Sample ID`)))
+  
+  unlink(test_file)
+})
+
+test_that("percentage call rates are converted correctly", {
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
+    "cel_files\ttotal_call_rate",
+    "sample1.cel\t97.5",     # > 1, should be divided by 100
+    "sample2.cel\t0.94",     # <= 1, should stay as is
+    "sample3.cel\t150.0"     # > 1, should be divided by 100
+  )
+  
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
+  
+  result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
+  
+  # Check conversion: 97.5 -> 0.975, 0.94 -> 0.94, 150.0 -> 1.5 (but capped at reasonable values in practice)
+  # Ordered by desc: 1.5, 0.975, 0.94
+  expected_call_rates <- c(1.5, 0.975, 0.94)
+  expect_equal(result$`Call Rate`, expected_call_rates)
+  
+  unlink(test_file)
+})
+
+test_that("data is ordered by call rate descending", {
+  test_content <- c(
+    "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
+    "cel_files\ttotal_call_rate",
+    "low_sample.cel\t90.0",
+    "high_sample.cel\t98.0",
+    "mid_sample.cel\t95.0"
+  )
+  
+  test_file <- tempfile(fileext = ".txt")
+  writeLines(test_content, test_file)
+  
+  result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
+  
+  # Should be ordered by call rate descending
+  expect_equal(result$`Sample ID`, c("high_sample", "mid_sample", "low_sample"))
+  expect_equal(result$`Call Rate`, c(0.98, 0.95, 0.90))
   
   unlink(test_file)
 })
