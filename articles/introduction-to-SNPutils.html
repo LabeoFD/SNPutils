@@ -71,6 +71,7 @@
 (0, 1, 2) to allele pairs. The package provides tools for:</p>
 <ul>
 <li>Converting genotype codes to actual allele pairs</li>
+<li>Converting numeric genotype codes to character labels</li>
 <li>Validating allele assignments according to standard genetic
 rules</li>
 <li>Generating standardized output formats (TYP and COM)</li>
@@ -92,14 +93,18 @@ rules</li>
 <p>In genetic data processing, genotypes are often represented as
 numerical codes:</p>
 <ul>
+<li>-1: Failed genotype call (NoCall)</li>
 <li>0: Homozygous for the first allele (A/A)</li>
 <li>1: Heterozygous (A/B)</li>
 <li>2: Homozygous for the second allele (B/B)</li>
 </ul>
 <p>These codes are convenient for computation. SNPutils converts these
-codes back to biologically meaningful allele pairs using annotation data
-that specifies which nucleotides (A, C, G, T) correspond to each
-allele.</p>
+codes to either:</p>
+<ol style="list-style-type: decimal">
+<li>Biologically meaningful allele pairs using annotation data</li>
+<li>Human-readable character labels for quality control and
+reporting</li>
+</ol>
 </div>
 <div class="section level2">
 <h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
@@ -159,11 +164,43 @@ the <code>Allele.A</code> column contains a deletion marker (“-”) and
 </h2>
 </div>
 <div class="section level2">
+<h2 id="recoding-genotype-data">Recoding genotype data<a class="anchor" aria-label="anchor" href="#recoding-genotype-data"></a>
+</h2>
+<p>The <code><a href="../reference/recode_genotypes.html">recode_genotypes()</a></code> function converts numeric call
+codes to their corresponding genotype call codes, making the data more
+readable and interpretable.</p>
+</div>
+<div class="section level2">
+<h2 id="genotype-coding-system">Genotype Coding System<a class="anchor" aria-label="anchor" href="#genotype-coding-system"></a>
+</h2>
+<p>The function uses the standard genotype coding:</p>
+<ul>
+<li>-1 → “NoCall” (missing genotype call)</li>
+<li>0 → “AA” (homozygous for allele A)</li>
+<li>1 → “AB” (heterozygous)</li>
+<li>2 → “BB” (homozygous for allele B)</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Convert numeric codes to genotype</span></span>
+<span><span class="va">recoded_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recode_genotypes.html">recode_genotypes</a></span><span class="op">(</span><span class="va">example_genotypes</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"Recoded genotype data:"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Recoded genotype data:"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">recoded_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   probeset_id Sample1 Sample2 Sample3</span></span>
+<span><span class="co">#&gt; 1        SNP1      AA      BB      BB</span></span>
+<span><span class="co">#&gt; 2        SNP2      AA      AB      AB</span></span>
+<span><span class="co">#&gt; 3        SNP3      AB      AB      AA</span></span>
+<span><span class="co">#&gt; 4        SNP4      AB      AA      BB</span></span>
+<span><span class="co">#&gt; 5        SNP5      BB      AA      AA</span></span>
+<span><span class="co">#&gt; 6        SNP6      AB      AB      BB</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="converting-genotypes-to-alleles">Converting Genotypes to Alleles<a class="anchor" aria-label="anchor" href="#converting-genotypes-to-alleles"></a>
 </h2>
-<p>The main function genotype2allele() converts numeric genotype codes
-to allele pairs:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>The main function <code><a href="../reference/genotype2allele.html">genotype2allele()</a></code> converts numeric
+genotype codes to allele pairs:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allele.html">genotype2allele</a></span><span class="op">(</span><span class="va">example_genotypes</span>, <span class="va">example_annotations</span><span class="op">)</span></span>
 <span><span class="co">#&gt; No rule violations found - all rules are respected.</span></span>
@@ -214,7 +251,7 @@ violations</li>
 <code>results</code>: Contains the converted genotype data</li>
 </ul>
 <p>Let’s examine the conversion results:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Look at the first few rows of the results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
@@ -276,7 +313,7 @@ other SNPs, Allele.A should be A or T, and Allele.B should be C or G
 marker <strong>Rule 5</strong>: For multi-base alleles, alleles should
 be in alphabetical order</p>
 <p>Let’s check if any validation issues were found:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check for validation issues</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span></span>
@@ -289,7 +326,7 @@ be in alphabetical order</p>
 </h5>
 <p>The package also includes an updated version with additional
 features:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles using enhanced function</span></span>
 <span><span class="va">results_v2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allelev2.html">genotype2allelev2</a></span><span class="op">(</span><span class="va">example_genotypes</span>, <span class="va">example_annotations</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
@@ -309,7 +346,7 @@ for alleles - Missing genotype handling (-1 → “–”) - Extended indel
 detection for multi-character alleles - Improved validation and error
 handling</p>
 <p>Let’s examine the conversion results:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Look at the first few rows of the results (using v2)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">results</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
@@ -346,7 +383,7 @@ deletion marker</li>
 in alphabetical order</li>
 </ul>
 <p>Let’s check if any validation issues were found:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check for validation issues</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">validation</span><span class="op">$</span><span class="va">rule_violations</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
@@ -363,7 +400,7 @@ in alphabetical order</li>
 <p>The <code><a href="../reference/allele2typ.html">allele2typ()</a></code> function converts the results to TYP
 format: <strong>NOTE: It’s a TYP format missing the header
 (Pre-TYP)</strong></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert to TYP format</span></span>
 <span><span class="va">typ_format</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/allele2typ.html">allele2typ</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span>
 <span></span>
@@ -395,7 +432,7 @@ two alleles</li>
 <h4 id="missing-genotypes">Missing Genotypes<a class="anchor" aria-label="anchor" href="#missing-genotypes"></a>
 </h4>
 <p>The enhanced function handles missing genotypes (-1) gracefully:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create test data with missing genotype</span></span>
 <span><span class="va">test_genotypes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  probeset_id <span class="op">=</span> <span class="st">"SNP1"</span>,</span>
@@ -415,14 +452,14 @@ two alleles</li>
 <span><span class="va">result_missing</span><span class="op">$</span><span class="va">results</span></span>
 <span><span class="co">#&gt;    probeset_id Sample_ID allele_genotype</span></span>
 <span><span class="co">#&gt;         &lt;char&gt;    &lt;char&gt;          &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:        SNP1   Sample1              --</span></span></code></pre></div>
+<span><span class="co">#&gt; 1:        SNP1   Sample1               -</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="handling-indels">Handling Indels<a class="anchor" aria-label="anchor" href="#handling-indels"></a>
 </h2>
 <p>Let’s focus on how SNPutils handles indels:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Filter for indels (SNP11-SNP20 in our example data)</span></span>
 <span><span class="va">indel_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"SNP1[1-9]|SNP20"</span>, <span class="va">probeset_id</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">indel_results</span><span class="op">)</span></span>
@@ -434,7 +471,7 @@ two alleles</li>
 <span><span class="co">#&gt; 4:       SNP12   Sample1             D/I</span></span>
 <span><span class="co">#&gt; 5:       SNP12   Sample2             D/D</span></span>
 <span><span class="co">#&gt; 6:       SNP12   Sample3             D/I</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Filter for indels (SNP11-SNP20 in our example data)</span></span>
 <span><span class="va">indel_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">results_v2</span><span class="op">$</span><span class="va">results</span>, <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"SNP1[1-9]|SNP20"</span>, <span class="va">probeset_id</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">indel_results</span><span class="op">)</span></span>
@@ -510,7 +547,7 @@ two alleles</li>
 similar to read your genotype data, especially if you need to skip
 header lines:</li>
 </ol>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read genotype data</span></span>
 <span><span class="va">genotype_data</span> <span class="op">&lt;-</span> <span class="fu">read_delim</span><span class="op">(</span></span>
 <span>  <span class="st">"path/to/genotype.txt"</span>,</span>
@@ -529,7 +566,7 @@ header lines:</li>
 <li>Check and Prepare Your Data</li>
 </ol>
 <p>Ensure your data has the required column names:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># For genotype data, ensure there's a column named "probeset_id"</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"probeset_id"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">genotype_data</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Rename the appropriate column</span></span>
@@ -546,7 +583,7 @@ header lines:</li>
 <ol start="3" style="list-style-type: decimal">
 <li>Process Your Data Convert genotypes to alleles:</li>
 </ol>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allele.html">genotype2allele</a></span><span class="op">(</span><span class="va">genotype_data</span>, <span class="va">annotation_data</span><span class="op">)</span></span>
 <span></span>
@@ -559,7 +596,7 @@ header lines:</li>
 <span><span class="co"># Convert to TYP format</span></span>
 <span><span class="va">typ_format</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/allele2typ.html">allele2typ</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 <p>Using the updated function <code><a href="../reference/genotype2allelev2.html">genotype2allelev2()</a></code>:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert genotypes to alleles using enhanced function</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/genotype2allelev2.html">genotype2allelev2</a></span><span class="op">(</span><span class="va">genotype_data</span>, <span class="va">annotation_data</span><span class="op">)</span></span>
 <span></span>
@@ -574,7 +611,7 @@ header lines:</li>
 <ol start="4" style="list-style-type: decimal">
 <li>Save Your Results Write the results to a file:</li>
 </ol>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Write TYP format to a file</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/write.table.html" class="external-link">write.csv</a></span><span class="op">(</span><span class="va">typ_format</span>, <span class="st">"output_typ.csv"</span>, row.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
