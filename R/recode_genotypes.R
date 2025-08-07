@@ -25,7 +25,7 @@
 #' print(recoded_data)
 #'
 #' @export
-#' @importFrom dplyr mutate across
+#' @importFrom dplyr mutate across all_of
 #' @importFrom dplyr case_when
 recode_genotypes <- function(genotype_data, id_column = "probeset_id") {
   # Input validation
