@@ -32,7 +32,7 @@ of special cases like missing genotypes and multi-character alleles.
 This enhanced version provides:
 \itemize{
 \item Space-to-dash conversion for alleles
-\item Handling of missing genotypes (-1 -> "--")
+\item Handling of missing genotypes (-1 -> "-")
 \item Extended indel detection for multi-character alleles
 \item Improved validation and error handling
 }

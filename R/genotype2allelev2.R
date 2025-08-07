@@ -25,7 +25,7 @@
 #' This enhanced version provides:
 #' \itemize{
 #'   \item Space-to-dash conversion for alleles
-#'   \item Handling of missing genotypes (-1 -> "--")
+#'   \item Handling of missing genotypes (-1 -> "-")
 #'   \item Extended indel detection for multi-character alleles
 #'   \item Improved validation and error handling
 #' }
@@ -82,7 +82,7 @@ genotype2allelev2 <- function(genotype_data, annotation_data, validate_alleles =
       allele_genotype = dplyr::case_when(
         
         # Handle missing genotype (-1)
-        genotype == -1 ~ "--",
+        genotype == -1 ~ "-",
         
         # First check if alleles exist (handle missing matches)
         is.na(allele_a) | is.na(allele_b) ~ NA_character_,
