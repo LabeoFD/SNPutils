@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 SNPutils is an R package designed to convert numerical genotype data (0, 1, 2) to allele pairs. The package provides tools for:
 
 - Converting genotype codes to actual allele pairs
+- Converting numeric genotype codes to character labels
 - Validating allele assignments according to standard genetic rules
 - Generating standardized output formats (TYP and COM)
 - Handling indels (insertions/deletions) correctly
@@ -35,11 +36,15 @@ remotes::install_github("LabeoFD/SNPutils")
 # Basic Concepts
 In genetic data processing, genotypes are often represented as numerical codes:
 
+- -1: Failed genotype call (NoCall)
 - 0: Homozygous for the first allele (A/A)
 - 1: Heterozygous (A/B)
 - 2: Homozygous for the second allele (B/B)
 
-These codes are convenient for computation. SNPutils converts these codes back to biologically meaningful allele pairs using annotation data that specifies which nucleotides (A, C, G, T) correspond to each allele.
+These codes are convenient for computation. SNPutils converts these codes to either:
+
+1. Biologically meaningful allele pairs using annotation data
+2. Human-readable character labels for quality control and reporting
 
 # Example Data
 SNPutils comes with example datasets to demonstrate its functionality:
@@ -72,8 +77,28 @@ The annotation data contains:
 The example data contains both standard SNPs and indels. For indels, the `Allele.A` column contains a deletion marker ("-") and `Allele.B` contains the insertion sequence.
 
 # Core Functionality
+# Recoding genotype data 
+
+The `recode_genotypes()` function converts numeric call codes to their corresponding genotype call codes, making the data more readable and interpretable.
+
+# Genotype Coding System
+The function uses the standard genotype coding:
+
+* -1 → "NoCall" (missing genotype call)
+* 0 → "AA" (homozygous for allele A)
+* 1 → "AB" (heterozygous)
+* 2 → "BB" (homozygous for allele B)
+
+```{r RecodeGeno}
+# Convert numeric codes to genotype
+recoded_data <- recode_genotypes(example_genotypes)
+
+print("Recoded genotype data:")
+head(recoded_data)
+```
+
 # Converting Genotypes to Alleles
-The main function genotype2allele() converts numeric genotype codes to allele pairs:
+The main function `genotype2allele()` converts numeric genotype codes to allele pairs:
 
 ```{r Geno2Alles}
 # Convert genotypes to alleles
