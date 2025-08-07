@@ -18,10 +18,14 @@
 #' }
 #'
 #' @export
-#' @import tidyverse
-#' @import crayon
-#' @import here
-#' @import lubridate
+#' @importFrom dplyr mutate select filter arrange case_when across transmute if_else desc all_of
+#' @importFrom readr read_csv write_csv read_delim
+#' @importFrom stringr str_detect str_replace str_extract str_split str_trim str_c str_remove str_match
+#' @importFrom purrr detect map
+#' @importFrom crayon red green blue bold yellow
+#' @importFrom here here
+#' @importFrom lubridate ymd now today parse_date_time
+
 create_com_file <- function(file_path, 
                             call_rate_threshold = 0.95, 
                             save_file = TRUE,
@@ -197,7 +201,7 @@ display_summary <- function(data, threshold, save_log = FALSE) {
   }
   
   cat("\n", bold("QC Call Rate Summary"), "\n")
-  cat("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+  cat("===============================================\n")
   cat("Call rate threshold:", bold(threshold), "\n")
   cat("Total samples:", bold(total), "\n")
   cat("Passing Threshold:", green(bold(passing)), "(", green(paste0(round(100 * passing / total, 1), "%")), ")\n")
@@ -213,21 +217,21 @@ display_summary <- function(data, threshold, save_log = FALSE) {
     cat("Passing mean:", green(round(passing_avg, 3)), "\n")
     
     if (qc_pass) {
-      cat("QC Check (≥98.5%):", green("PASS"), "(", passing_avg_percent, "%)\n")
+      cat("QC Check (>=98.5%):", green("PASS"), "(", passing_avg_percent, "%)\n")
       if (save_log) {
         log_content <- c(
           log_content, 
           paste("Passing mean:", round(passing_avg, 3)),
-          paste("QC Check (≥98.5%): PASS (", passing_avg_percent, "%)")
+          paste("QC Check (>=98.5%): PASS (", passing_avg_percent, "%)")
         )
       }
     } else {
-      cat("QC Check (≥98.5%):", red("FAIL"), "(", passing_avg_percent, "%)\n")
+      cat("QC Check (>=98.5%):", red("FAIL"), "(", passing_avg_percent, "%)\n")
       if (save_log) {
         log_content <- c(
           log_content, 
           paste("Passing mean:", round(passing_avg, 3)),
-          paste("QC Check (≥98.5%): FAIL (", passing_avg_percent, "%)")
+          paste("QC Check (>=98.5%): FAIL (", passing_avg_percent, "%)")
         )
       }
     }
@@ -249,7 +253,7 @@ display_summary <- function(data, threshold, save_log = FALSE) {
     }
   }
   
-  cat("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+  cat("===============================================\n\n")
   
   return(list(log_content = log_content))
 }
