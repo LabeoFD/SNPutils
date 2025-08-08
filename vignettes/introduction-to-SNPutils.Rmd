@@ -173,11 +173,11 @@ For each genotype, the function has created an `allele_genotype` showing the act
 ### Validating Allele Assignments
 SNPutils automatically validates allele assignments according to standard rules:
 
-- **Rule 1**: SNPs are fixed on the forward strand of the design-time reference genome
-- **Rule 2**: For AT/CG SNPs, alleles should be in alphabetical order
-- **Rule 3**: For other SNPs, Allele.A should be A or T, and Allele.B should be C or G
-- **Rule 4**: For indels, Allele.B should not be a deletion marker
-- **Rule 5**: For multi-base alleles, alleles should be in alphabetical order
+* **Rule 1**: SNPs are fixed on the forward strand of the design-time reference genome
+* **Rule 2**: For AT/CG SNPs, alleles should be in alphabetical order
+* **Rule 3**: For other SNPs, Allele.A should be A or T, and Allele.B should be C or G
+* **Rule 4**: For indels, Allele.B should not be a deletion marker
+* **Rule 5**: For multi-base alleles, alleles should be in alphabetical order
 
 Let's check if any validation issues were found:
 
@@ -193,21 +193,54 @@ if (!is.null(results_v2$validation$rule_violations) &&
 
 # Converting to TYP Format
 The `allele2typ()` function converts the results to TYP format:
-**NOTE: It's a TYP format missing the header (Pre-TYP)**
 
 ```{r Typ}
-# Convert to TYP format
-typ_format <- allele2typ(results)
+# Create a mock Axiom calls file for demonstration
+temp_calls_file <- tempfile(pattern = "axiom.report", fileext = ".txt")
+calls_content <- c(
+  "#%create_date=2025-01-15 14:30:45",
+  "#%guid=12345678-1234-1234-1234-123456789012",
+  "#%affymetrix-algorithm-param-apt-time-str=Wed Jan 15 14:30:45 2025",
+  "#%affymetrix-algorithm-param-apt-version=1.21.0",
+  "#%affymetrix-algorithm-name=apt-genotype-axiom",
+  "probeset_id\tsample1\tsample2",
+  "SNP_001\t2\t1",
+  "SNP_002\t1\t2"
+)
+writeLines(calls_content, temp_calls_file)
 
-# View the TYP format data
-head(typ_format)
+# Convert to TYP format using the mock Axiom report file
+typ_result <- allele2typ(
+  conversion_results = results,
+  calls_file_path = temp_calls_file
+)
+
+# View the structure of the TYP result
+str(typ_result, max.level = 1)
 ```
 
-The TYP format includes:
+The `allele2typ()` function returns a comprehensive list with:
 
-- `Sample_ID`: Sample identifier
-- `SNP_Name`: SNP identifier
-- `Allele1_Forward` and `Allele2_Forward`: The two alleles
+* `data`: Clean processed data (Sample_ID without .CEL, SNP_Name, alleles)
+* `formatted`: Complete formatted output with headers for file writing
+* `header_info`: Metadata information (processing date, counts, etc.)
+* `file_path`: Path to saved file (if save_file = TRUE)
+* `log_content`: Detailed processing logs
+
+```{r TypData}
+# View the processed data
+head(typ_result$data)
+```
+
+```{r TypHeader}
+# View the header information
+print(typ_result$header_info)
+```
+
+```{r TypFormatted}
+# View the first few lines of the formatted output
+head(typ_result$formatted, 15)
+```
 
 # Handling Special Cases
 

@@ -2,23 +2,129 @@
 % Please edit documentation in R/allele2typ.R
 \name{allele2typ}
 \alias{allele2typ}
-\title{Convert Results to TYP Format}
+\title{Convert Allele Data to TYP Format}
 \usage{
-allele2typ(conversion_results)
+allele2typ(
+  conversion_results,
+  calls_file_path,
+  output_dir = NULL,
+  save_file = FALSE,
+  save_log = FALSE
+)
 }
 \arguments{
-\item{conversion_results}{Results from genotype2allele()}
+\item{conversion_results}{A list containing conversion results with a 'results' component.
+The 'results' component must be a data frame with columns: Sample_ID, probeset_id,
+and allele_genotype. Sample_ID can contain .CEL extensions which will be removed.}
+
+\item{calls_file_path}{Character string specifying the path to the AxiomGT1.calls.txt file
+from which processing date information will be extracted. This file must contain the
+Affymetrix timestamp header line.}
+
+\item{output_dir}{Character string specifying the output directory path where files will be saved.
+Can be absolute or relative path. Required when save_file or save_log is TRUE. Default is NULL.}
+
+\item{save_file}{Logical indicating whether to save the formatted output as a CSV file.
+When TRUE, creates a file named "IFCE_LFR9_TYPEQv1_DDMMYY_XX.csv" where DDMMYY is
+the processing date and XX is a sequence number. Default is FALSE.}
+
+\item{save_log}{Logical indicating whether to save detailed processing logs as a text file.
+Creates a corresponding log file with "_log.txt" suffix. Default is FALSE.}
 }
 \value{
-A data frame in TYP format with Sample_ID, SNP_Name, Allele1_Forward, and Allele2_Forward columns
+A list with the following components:
+\describe{
+\item{data}{Processed tibble with columns: Sample_ID (without .CEL), SNP_Name,
+Allele1_Forward, Allele2_Forward. Ready for further R processing.}
+\item{formatted}{Single-column tibble (V1) containing the complete formatted output
+with header section and data, suitable for file writing.}
+\item{header_info}{Tibble containing metadata information with Parameter and Value columns
+including GSGT Version, Processing Date, Content, and sample/SNPounts.}
+\item{file_path}{Character string with full path to the saved CSV file, or NULL if
+save_file was FALSE or saving failed.}
+\item{log_content}{Character vector containing detailed processing log messages for
+debugging and verification purposes.}
+}
 }
 \description{
-Converts genotype results from genotype2allele() into TYP format,
-which provides a structured representation with forward alleles.
+This function converts allele genotype data from conversion results into TYP format,
+suitable for genetic analysis workflows. It processes SNP genotype data, extracts
+processing information from Axiom calls files, and creates formatted output with
+proper headers and metadata.
 }
+\details{
+The function performs the following key operations:
+\itemize{
+\item Validates input data structure and required columns
+\item Removes .CEL extensions from Sample_ID values
+\item Splits allele_genotype into separate Allele1_Forward and Allele2_Forward columns
+\item Extracts processing date from Axiom calls file header
+\item Creates formatted header with metadata (GSGT version, processing date, counts)
+\item Generates properly formatted CSV output with header section and data section
+\item Implements file versioning (sequence numbers) to prevent overwrites
+\item Provides comprehensive error handling and logging
+}
+
+The output CSV file structure includes:
+\itemize{
+\item header section with metadata as Parameter,Value pairs
+\item data section with SNP genotype data in proper CSV columns
+\item Automatic file versioning with sequence numbers (01, 02, 03)
+}
+}
+\section{Input Requirements}{
+
+The conversion_results$results data frame must contain:
+\itemize{
+\item Sample_ID: Sample identifiers (can include .CEL extension)
+\item probeset_id: SNP probe set identifiers
+\item allele_genotype: Genotype calls in format "A/T", "G/C", etc.
+}
+
+The calls_file_path must point to an Axiom calls filcontaining:
+\itemize{
+\item Header line with "#\%affymetrix-algorithm-param-apt-time-str" for date extraction
+}
+}
+
+\section{File Output}{
+
+When save_file = TRUE, creates files with naming convention:
+\itemize{
+\item CSV: "IFCE_LFR9_TYPEQv1_DDMMYY_XX.csv"
+\item Log: "IFCE_LFR9_TYPEQv1_DDMMYY_XX_log.txt"
+Where DDMMYY is processing date and XX is sequence number (01-03).
+}
+}
+
 \examples{
 \dontrun{
-results <- genotype2allele(genotype_data, annotation_data)
-typ_data <- allele2typ(results)
+# Basic usage - process data without saving
+result <- allele2typ(
+  conversion_results = my_conversion_data,
+  calls_file_path = "path/to/AxiomGT1.calls.txt"
+)
+
+# Access processed data
+processed_data <- result$data
+header_info <- result$header_info
+
+# Save files to output directory
+result <- allele2typ(
+  conversion_results = my_conversion_data,
+  calls_file_path = "path/to/AxiomGT1.calls.txt",
+  output_dir = "output/genotypes",
+  save_file = TRUE,
+  save_log = TRUE
+)
+
+# Check file path and log
+cat("File saved to:", result$file_path)
+cat("Processing log:\n", paste(resu$log_content, collapse = "\n"))
 }
+
+}
+\seealso{
+\code{\link[readr]{write_csv}} for CSV writing functionality
+\code{\link[lubridate]{parse_date_time}} for date parsing
 }
