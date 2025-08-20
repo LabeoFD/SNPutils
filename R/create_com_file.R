@@ -157,8 +157,8 @@ process_data <- function(lines, call_rate_threshold) {
       `Sample ID` = str_remove(cel_files, "\\.(cel|CEL)$") %>% 
         str_remove("^.*[\\/\\\\]"),
       `Call Rate` = case_when(
-        call_rate > 1 ~ round(call_rate / 100, 6),
-        TRUE ~ round(as.numeric(call_rate), 6)
+        as.numeric(call_rate) > 1 ~ as.numeric(call_rate) / 100,
+        TRUE ~ as.numeric(call_rate)
       ),
       Comment = if_else(`Call Rate` >= call_rate_threshold, "0", "1"),
       Status = if_else(`Call Rate` >= call_rate_threshold, "PASS", "FAIL")

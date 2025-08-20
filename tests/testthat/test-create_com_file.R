@@ -132,7 +132,7 @@ test_that("call rate conversion is correct", {
   result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
   
   expected_rates <- c(0.975, 0.94)  # Ordered by desc call rate
-  expect_equal(result$`Call Rate`, expected_rates)
+  expect_equal(result$`Call Rate`, expected_rates, tolerance = 1e-10)
   
   unlink(test_file)
 })
@@ -141,8 +141,8 @@ test_that("comment assignment works correctly", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
     "cel_files\tcall_rate",
-    "sample1.cel\t97.5",    # Above 0.95 threshold -> Comment "0"
-    "sample2.cel\t92.0"     # Below 0.95 threshold -> Comment "1"
+    "sample1.cel\t97.5",   # Above threshold: 97.5/100 = 0.975 -> Comment "0" 
+    "sample2.cel\t92.0"    # Below threshold: 92.0/100 = 0.92 -> Comment "1"
   )
   
   test_file <- tempfile(fileext = ".txt")
@@ -233,10 +233,10 @@ test_that("percentage call rates are converted correctly", {
   
   result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
   
-  # Check conversion: 97.5 -> 0.975, 0.94 -> 0.94, 150.0 -> 1.5 (but capped at reasonable values in practice)
+  # Check conversion: 97.5 -> 0.975, 0.94 -> 0.94, 150.0 -> 1.5
   # Ordered by desc: 1.5, 0.975, 0.94
   expected_call_rates <- c(1.5, 0.975, 0.94)
-  expect_equal(result$`Call Rate`, expected_call_rates)
+  expect_equal(result$`Call Rate`, expected_call_rates, tolerance = 1e-10)
   
   unlink(test_file)
 })
@@ -255,9 +255,9 @@ test_that("data is ordered by call rate descending", {
   
   result <- create_com_file(test_file, save_file = FALSE, save_log = FALSE)
   
-  # Should be ordered by call rate descending
+  # Should be ordered by call rate descending: 98.0->0.98, 95.0->0.95, 90.0->0.90
   expect_equal(result$`Sample ID`, c("high_sample", "mid_sample", "low_sample"))
-  expect_equal(result$`Call Rate`, c(0.98, 0.95, 0.90))
+  expect_equal(result$`Call Rate`, c(0.98, 0.95, 0.90), tolerance = 1e-10)
   
   unlink(test_file)
 })
