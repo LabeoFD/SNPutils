@@ -3,7 +3,7 @@ test_that("create_com_file works with valid input", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
     "#%other-header-info",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "sample1.cel\t97.5",
     "sample2.cel\t94.0",
     "sample3.cel\t98.2"
@@ -45,7 +45,7 @@ test_that("create_com_file works with valid input", {
 test_that("create_com_file handles custom thresholds", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "sample1.cel\t97.5",
     "sample2.cel\t94.0"
   )
@@ -80,7 +80,7 @@ test_that("create_com_file validates inputs correctly", {
   # Test invalid threshold
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "sample1.cel\t97.5"
   )
   test_file <- tempfile(fileext = ".txt")
@@ -102,7 +102,7 @@ test_that("create_com_file validates inputs correctly", {
 test_that("date parsing works correctly", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "sample1.cel\t97.5"
   )
   
@@ -121,7 +121,7 @@ test_that("date parsing works correctly", {
 test_that("call rate conversion is correct", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "sample1.cel\t97.5",    # Should be converted to 0.975
     "sample2.cel\t0.94"     # Should stay as 0.94
   )
@@ -140,7 +140,7 @@ test_that("call rate conversion is correct", {
 test_that("comment assignment works correctly", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "sample1.cel\t97.5",    # Above 0.95 threshold -> Comment "0"
     "sample2.cel\t92.0"     # Below 0.95 threshold -> Comment "1"
   )
@@ -195,7 +195,7 @@ test_that("empty data file triggers error", {
 test_that("sample ID extraction removes file extensions and paths", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "/path/to/sample1.cel\t97.5",
     "C:\\Windows\\Path\\sample2.CEL\t94.0",
     "sample3.cel\t96.0"
@@ -222,7 +222,7 @@ test_that("sample ID extraction removes file extensions and paths", {
 test_that("percentage call rates are converted correctly", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "sample1.cel\t97.5",     # > 1, should be divided by 100
     "sample2.cel\t0.94",     # <= 1, should stay as is
     "sample3.cel\t150.0"     # > 1, should be divided by 100
@@ -244,7 +244,7 @@ test_that("percentage call rates are converted correctly", {
 test_that("data is ordered by call rate descending", {
   test_content <- c(
     "#%affymetrix-algorithm-param-apt-time-str=Thu May 25 14:30:22 2023",
-    "cel_files\ttotal_call_rate",
+    "cel_files\tcall_rate",
     "low_sample.cel\t90.0",
     "high_sample.cel\t98.0",
     "mid_sample.cel\t95.0"

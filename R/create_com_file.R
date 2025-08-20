@@ -144,7 +144,7 @@ process_data <- function(lines, call_rate_threshold) {
     show_col_types = FALSE
   )
   
-  required_cols <- c("cel_files", "total_call_rate")
+  required_cols <- c("cel_files", "call_rate")
   missing_cols <- setdiff(required_cols, names(data_df))
   
   if (length(missing_cols) > 0) {
@@ -157,8 +157,8 @@ process_data <- function(lines, call_rate_threshold) {
       `Sample ID` = str_remove(cel_files, "\\.(cel|CEL)$") %>% 
         str_remove("^.*[\\/\\\\]"),
       `Call Rate` = case_when(
-        total_call_rate > 1 ~ round(total_call_rate / 100, 6),
-        TRUE ~ round(as.numeric(total_call_rate), 6)
+        call_rate > 1 ~ round(call_rate / 100, 6),
+        TRUE ~ round(as.numeric(call_rate), 6)
       ),
       Comment = if_else(`Call Rate` >= call_rate_threshold, "0", "1"),
       Status = if_else(`Call Rate` >= call_rate_threshold, "PASS", "FAIL")
