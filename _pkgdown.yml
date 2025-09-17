@@ -29,6 +29,7 @@ reference:
   - allele2typ
   - create_com_file
   - recode_genotypes
+  - validate_typcom
 
 - title: Example Data
   desc: Datasets for demonstration
